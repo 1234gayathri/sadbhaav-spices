@@ -152,7 +152,7 @@ export function ClientFooter() {
         </div>
         <FooterCol title="Shop" links={[["All Products","/client/shop"],["Turmeric","/client/shop"],["Chilli","/client/shop"],["Cardamom","/client/shop"]]} />
         <FooterCol title="Company" links={[["About","/"],["Contact","/"],["Sustainability","/"],["Blog","/"]]} />
-        <FooterCol title="Help" links={[["Track Order","/client/track"],["Returns","/"],["FAQs","/"],["Admin Portal","/admin"]]} />
+        <FooterCol title="Help" links={[["Track Order","/client/track"],["Returns","/"],["FAQs","/"]]} />
       </div>
       <div className="border-t py-5 text-center text-xs text-muted-foreground">
         © {new Date().getFullYear()} Sadbhaav Spices Co. · Crafted in India

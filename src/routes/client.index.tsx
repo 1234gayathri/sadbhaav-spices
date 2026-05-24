@@ -5,6 +5,16 @@ import { motion } from "framer-motion";
 import { ArrowRight, Quote, Sparkles, ChevronLeft, ChevronRight, Leaf, ShieldCheck, Heart } from "lucide-react";
 import { ProductCard } from "@/components/client/ProductCard";
 import heroImg from "@/assets/hero-spices.jpg";
+import turmericImg from "@/assets/turmeric.jpg";
+import chilliImg from "@/assets/chilli.jpg";
+import cardamomImg from "@/assets/cardamom.jpg";
+
+// Map category → bundled image (resolved at build time by Vite)
+const CATEGORY_IMAGES: Record<string, string> = {
+  Turmeric: turmericImg,
+  Chilli: chilliImg,
+  Cardamom: cardamomImg,
+};
 
 export const getClientHomeFn = createServerFn({ method: "GET" }).handler(async () => {
   const { getProducts, getTestimonials, getBanners, getCoupons } = await import("@/lib/db");
@@ -70,7 +80,7 @@ function ClientHome() {
             className="relative aspect-[5/4] overflow-hidden rounded-3xl shadow-elegant"
           >
             <img
-              src={activeBanner?.image || heroImg}
+              src={heroImg}
               alt={activeBanner?.text || "Sadbhaav spices"}
               width={1536}
               height={1024}
@@ -143,7 +153,9 @@ function ClientHome() {
           {/* Best sellers */}
           <Section title="Best sellers" subtitle="Loved by our customers">
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {products.slice(0, 3).map((p) => <ProductCard key={p.id} p={p} />)}
+              {products.slice(0, 3).map((p) => (
+                <ProductCard key={p.id} p={{ ...p, image: CATEGORY_IMAGES[p.category] || p.image }} />
+              ))}
             </div>
           </Section>
 
@@ -172,7 +184,9 @@ function ClientHome() {
           {/* Trending */}
           <Section title="Trending" subtitle="What's flying off our shelves">
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {products.slice(3, 6).map((p) => <ProductCard key={p.id} p={p} />)}
+              {products.slice(3, 6).map((p) => (
+                <ProductCard key={p.id} p={{ ...p, image: CATEGORY_IMAGES[p.category] || p.image }} />
+              ))}
             </div>
           </Section>
         </>

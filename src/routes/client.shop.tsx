@@ -3,6 +3,15 @@ import { createServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 import { Search, SlidersHorizontal } from "lucide-react";
 import { ProductCard } from "@/components/client/ProductCard";
+import turmericImg from "@/assets/turmeric.jpg";
+import chilliImg from "@/assets/chilli.jpg";
+import cardamomImg from "@/assets/cardamom.jpg";
+
+const CATEGORY_IMAGES: Record<string, string> = {
+  Turmeric: turmericImg,
+  Chilli: chilliImg,
+  Cardamom: cardamomImg,
+};
 
 export const getShopProductsFn = createServerFn({ method: "GET" }).handler(async () => {
   const { getProducts } = await import("@/lib/db");
@@ -86,21 +95,13 @@ function Shop() {
           <p className="font-display text-2xl font-semibold">No spices in the library</p>
           <p className="mt-2 text-muted-foreground text-sm px-6 max-w-md">
             {products.length === 0 
-              ? "We are currently stocking up our fresh organic spices. Please check back shortly or visit the Admin Portal to add products!"
+              ? "We are currently stocking up our fresh organic spices. Please check back shortly."
               : "No products match your current filters or search criteria."}
           </p>
-          {products.length === 0 && (
-            <Link
-              to="/admin/products"
-              className="mt-6 inline-flex rounded-full bg-foreground px-6 py-2.5 text-xs font-semibold text-background hover:opacity-90 transition"
-            >
-              Go to Admin Portal
-            </Link>
-          )}
         </div>
       ) : (
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {list.map((p) => <ProductCard key={p.id} p={p} />)}
+          {list.map((p) => <ProductCard key={p.id} p={{ ...p, image: CATEGORY_IMAGES[p.category] || p.image }} />)}
         </div>
       )}
     </div>
