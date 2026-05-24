@@ -1,0 +1,89 @@
+import { Link, useRouterState } from "@tanstack/react-router";
+import { useState } from "react";
+import {
+  LayoutDashboard, Package, ShoppingCart, Users, Tag, Image as ImageIcon,
+  Settings, Bell, Search, Menu, X, ArrowLeft
+} from "lucide-react";
+import { Logo } from "@/components/Logo";
+import { ThemeToggle } from "@/components/ThemeToggle";
+
+const nav = [
+  { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { to: "/admin/products", label: "Products", icon: Package },
+  { to: "/admin/orders", label: "Orders", icon: ShoppingCart },
+  { to: "/admin/customers", label: "Customers", icon: Users },
+  { to: "/admin/offers", label: "Offers", icon: Tag },
+  { to: "/admin/content", label: "Content", icon: ImageIcon },
+  { to: "/admin/settings", label: "Settings", icon: Settings },
+];
+
+export function AdminShell({ children, title, subtitle }: { children: React.ReactNode; title: string; subtitle?: string }) {
+  const path = useRouterState({ select: (s) => s.location.pathname });
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="min-h-screen bg-muted/30">
+      {/* Sidebar */}
+      <aside className={`fixed inset-y-0 left-0 z-40 w-64 border-r bg-sidebar text-sidebar-foreground transition-transform lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}>
+        <div className="flex h-16 items-center justify-between px-5 border-b">
+          <Logo to="/admin" />
+          <button onClick={() => setOpen(false)} className="lg:hidden p-1"><X className="h-5 w-5" /></button>
+        </div>
+        <nav className="p-3 space-y-0.5">
+          {nav.map((n) => {
+            const active = n.exact ? path === n.to : path.startsWith(n.to);
+            return (
+              <Link key={n.to} to={n.to} onClick={() => setOpen(false)}
+                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+                  active ? "bg-primary text-primary-foreground shadow-soft" : "hover:bg-sidebar-accent"
+                }`}>
+                <n.icon className="h-4 w-4" /> {n.label}
+              </Link>
+            );
+          })}
+        </nav>
+        <div className="absolute bottom-4 left-3 right-3">
+          <Link to="/" className="flex items-center gap-2 rounded-xl border bg-card p-3 text-xs hover:bg-sidebar-accent transition">
+            <ArrowLeft className="h-3.5 w-3.5" /> Back to landing
+          </Link>
+        </div>
+      </aside>
+
+      <div className="lg:pl-64">
+        {/* Topbar */}
+        <header className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur-md">
+          <div className="flex h-16 items-center gap-3 px-6">
+            <button onClick={() => setOpen(true)} className="lg:hidden p-1"><Menu className="h-5 w-5" /></button>
+            <div className="relative hidden md:block flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <input placeholder="Search products, orders, customers…"
+                className="w-full rounded-full border bg-muted/40 pl-9 pr-4 py-2 text-sm outline-none focus:border-primary focus:bg-background" />
+            </div>
+            <div className="ml-auto flex items-center gap-1">
+              <ThemeToggle />
+              <button className="relative p-2 rounded-full hover:bg-accent/10" aria-label="Notifications">
+                <Bell className="h-5 w-5" />
+                <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-accent" />
+              </button>
+              <div className="ml-2 flex items-center gap-2 pl-3 border-l">
+                <div className="h-8 w-8 rounded-full bg-gradient-warm" />
+                <div className="hidden sm:block">
+                  <div className="text-xs font-semibold">Admin</div>
+                  <div className="text-[10px] text-muted-foreground">owner@sadbhaav.in</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <main className="p-6 lg:p-8">
+          <div className="mb-6">
+            <h1 className="font-display text-3xl font-semibold">{title}</h1>
+            {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
+          </div>
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+}
