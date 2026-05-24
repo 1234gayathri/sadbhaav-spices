@@ -8,21 +8,21 @@ import { AdminShell } from "@/components/admin/AdminShell";
 
 export const getCouponsFn = createServerFn({ method: "GET" }).handler(async () => {
   const { getCoupons } = await import("@/lib/db");
-  return getCoupons();
+  return await getCoupons();
 });
 
 export const addCouponFn = createServerFn({ method: "POST" })
   .inputValidator((data: { code: string; description: string; maxUses: number; expiry: string }) => data)
   .handler(async ({ data }) => {
     const { addCoupon } = await import("@/lib/db");
-    return addCoupon(data);
+    return await addCoupon(data);
   });
 
 export const deleteCouponFn = createServerFn({ method: "POST" })
   .inputValidator((code: string) => code)
   .handler(async ({ data: code }) => {
     const { deleteCoupon } = await import("@/lib/db");
-    return deleteCoupon(code);
+    return await deleteCoupon(code);
   });
 
 // ─── Route ────────────────────────────────────────────────────────────────────

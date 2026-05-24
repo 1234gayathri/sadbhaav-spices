@@ -8,7 +8,7 @@ import { Mail, Phone, Search } from "lucide-react";
 
 export const getCustomersFn = createServerFn({ method: "GET" }).handler(async () => {
   const { getCustomers } = await import("@/lib/db");
-  return getCustomers();
+  return await getCustomers();
 });
 
 // ─── Route ────────────────────────────────────────────────────────────────────

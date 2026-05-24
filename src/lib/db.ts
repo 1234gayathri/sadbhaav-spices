@@ -1,8 +1,11 @@
 /**
- * db.ts — Server-only persistent database backed by data/db.json
+ * db.ts — Server-only persistent database with Upstash Redis cloud backup
  *
- * Uses Node.js `fs` which is available in TanStack Start / Vite SSR dev mode.
- * All mutations are synchronous-safe because server functions are serialized per request.
+ * Uses a local JSON file for fast in-session reads, with Upstash Redis
+ * as persistent storage that survives Render free-tier restarts/redeploys.
+ *
+ * Setup: Add UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN env vars.
+ * Without these env vars, falls back to local-only file storage.
  */
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
@@ -17,11 +20,11 @@ export type Order = {
   email?: string;
   phone?: string;
   address?: string;
-  paymentMethod?: string;
-  date: string;
   items: number;
   total: number;
   status: string;
+  date: string;
+  paymentMethod?: string;
 };
 
 export type Customer = {
@@ -34,23 +37,26 @@ export type Customer = {
 
 export type Coupon = {
   code: string;
-  description: string;
+  discount: number;
+  type: "percent" | "flat";
+  expiry?: string;
   uses: number;
-  maxUses: number;
-  expiry: string;
   active: boolean;
 };
 
 export type Banner = {
   id: string;
-  text: string;
+  title: string;
+  subtitle?: string;
   image: string;
+  discount?: string;
 };
 
 export type Testimonial = {
   id: string;
   name: string;
-  quote: string;
+  text: string;
+  rating: number;
 };
 
 export type StoreSettings = {
@@ -97,92 +103,151 @@ const SEED: DbSchema = {
 
 // ─── File Path ────────────────────────────────────────────────────────────────
 
-// In production on Render, use the mounted persistent disk at /data.
-// In local dev, fall back to the project's own data/ folder.
-const DATA_DIR =
-  process.env.NODE_ENV === "production"
-    ? "/data"
-    : resolve(process.cwd(), "data");
+const DATA_DIR = resolve(process.cwd(), "data");
 const DB_FILE = resolve(DATA_DIR, "db.json");
+
+// ─── In-Memory Cache ──────────────────────────────────────────────────────────
+
+let _cache: DbSchema | null = null;
+
+// ─── Upstash Redis Helpers ────────────────────────────────────────────────────
+
+const REDIS_KEY = "sadbhaav_db";
+
+async function redisGet(): Promise<DbSchema | null> {
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) return null;
+  try {
+    const res = await fetch(`${url}/get/${REDIS_KEY}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const json = (await res.json()) as { result?: string };
+    if (json.result) return JSON.parse(json.result) as DbSchema;
+  } catch (e) {
+    console.error("[db] Redis GET error:", e);
+  }
+  return null;
+}
+
+function redisSet(data: DbSchema): void {
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) return;
+  fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(["SET", REDIS_KEY, JSON.stringify(data)]),
+  }).catch((e) => console.error("[db] Redis SET error:", e));
+}
 
 // ─── Read / Write ─────────────────────────────────────────────────────────────
 
-function readDb(): DbSchema {
+function writeLocal(data: DbSchema): void {
   try {
-    if (!existsSync(DB_FILE)) return structuredClone(SEED);
-    const raw = readFileSync(DB_FILE, "utf-8");
-    const db = JSON.parse(raw) as DbSchema;
-    // Auto-migrate if settings are missing
-    if (!db.settings) {
-      db.settings = structuredClone(SEED.settings);
-      writeDb(db);
-    }
-    return db;
-  } catch {
-    return structuredClone(SEED);
+    if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
+    writeFileSync(DB_FILE, JSON.stringify(data, null, 2), "utf-8");
+  } catch (e) {
+    console.error("[db] Local file write error:", e);
   }
 }
 
-function writeDb(data: DbSchema): void {
-  if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
-  writeFileSync(DB_FILE, JSON.stringify(data, null, 2), "utf-8");
+async function readDb(): Promise<DbSchema> {
+  // 1. Return in-memory cache if available (fastest)
+  if (_cache) return _cache;
+
+  // 2. Try local JSON file (fast, works within same server session)
+  try {
+    if (existsSync(DB_FILE)) {
+      const raw = readFileSync(DB_FILE, "utf-8");
+      const db = JSON.parse(raw) as DbSchema;
+      if (!db.settings) {
+        db.settings = structuredClone(SEED.settings);
+        writeLocal(db);
+        redisSet(db);
+      }
+      _cache = db;
+      return _cache;
+    }
+  } catch {}
+
+  // 3. Fetch from Upstash Redis (survives restarts/redeploys)
+  const fromRedis = await redisGet();
+  if (fromRedis) {
+    _cache = fromRedis;
+    writeLocal(fromRedis);
+    return _cache;
+  }
+
+  // 4. First-ever run — use seed data
+  _cache = structuredClone(SEED);
+  return _cache;
+}
+
+async function writeDb(data: DbSchema): Promise<void> {
+  _cache = data;
+  writeLocal(data);
+  redisSet(data);
 }
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 // Products
-export function getProducts(): Product[] {
-  return readDb().products;
+export async function getProducts(): Promise<Product[]> {
+  return (await readDb()).products;
 }
 
-export function addProduct(product: Omit<Product, "id">): Product {
-  const db = readDb();
+export async function addProduct(product: Omit<Product, "id">): Promise<Product> {
+  const db = await readDb();
   const newProduct: Product = { ...product, id: `prod-${Date.now()}` };
   db.products = [newProduct, ...db.products];
-  writeDb(db);
+  await writeDb(db);
   return newProduct;
 }
 
-export function updateProduct(id: string, updates: Partial<Product>): Product | null {
-  const db = readDb();
+export async function updateProduct(id: string, updates: Partial<Product>): Promise<Product | null> {
+  const db = await readDb();
   const idx = db.products.findIndex((p) => p.id === id);
   if (idx === -1) return null;
   db.products[idx] = { ...db.products[idx], ...updates };
-  writeDb(db);
+  await writeDb(db);
   return db.products[idx];
 }
 
-export function deleteProduct(id: string): boolean {
-  const db = readDb();
+export async function deleteProduct(id: string): Promise<boolean> {
+  const db = await readDb();
   const before = db.products.length;
   db.products = db.products.filter((p) => p.id !== id);
   if (db.products.length === before) return false;
-  writeDb(db);
+  await writeDb(db);
   return true;
 }
 
 // Orders
-export function getOrders(): Order[] {
-  return readDb().orders;
+export async function getOrders(): Promise<Order[]> {
+  return (await readDb()).orders;
 }
 
-export function updateOrderStatus(id: string, status: string): Order | null {
-  const db = readDb();
+export async function updateOrderStatus(id: string, status: string): Promise<Order | null> {
+  const db = await readDb();
   const idx = db.orders.findIndex((o) => o.id === id);
   if (idx === -1) return null;
   db.orders[idx] = { ...db.orders[idx], status };
-  writeDb(db);
+  await writeDb(db);
   return db.orders[idx];
 }
 
 // Customers
-export function getCustomers(): Customer[] {
-  return readDb().customers;
+export async function getCustomers(): Promise<Customer[]> {
+  return (await readDb()).customers;
 }
 
 // Coupons
-export function getCoupons(): Coupon[] {
-  const db = readDb();
+export async function getCoupons(): Promise<Coupon[]> {
+  const db = await readDb();
   const now = new Date();
   const before = db.coupons.length;
   // Auto-delete coupons whose expiry date has passed
@@ -193,87 +258,87 @@ export function getCoupons(): Coupon[] {
     return expDate >= now; // keep only if not yet expired
   });
   if (db.coupons.length !== before) {
-    writeDb(db); // only write if something was actually deleted
+    await writeDb(db); // only write if something was actually deleted
   }
   return db.coupons;
 }
 
-export function addCoupon(coupon: Omit<Coupon, "uses" | "active">): Coupon {
-  const db = readDb();
+export async function addCoupon(coupon: Omit<Coupon, "uses" | "active">): Promise<Coupon> {
+  const db = await readDb();
   const newCoupon: Coupon = { ...coupon, uses: 0, active: true };
   db.coupons = [newCoupon, ...db.coupons];
-  writeDb(db);
+  await writeDb(db);
   return newCoupon;
 }
 
-export function deleteCoupon(code: string): boolean {
-  const db = readDb();
+export async function deleteCoupon(code: string): Promise<boolean> {
+  const db = await readDb();
   const before = db.coupons.length;
   db.coupons = db.coupons.filter((c) => c.code !== code);
   if (db.coupons.length === before) return false;
-  writeDb(db);
+  await writeDb(db);
   return true;
 }
 
 // Banners
-export function getBanners(): Banner[] {
-  return readDb().banners;
+export async function getBanners(): Promise<Banner[]> {
+  return (await readDb()).banners;
 }
 
-export function addBanner(banner: Omit<Banner, "id">): Banner {
-  const db = readDb();
+export async function addBanner(banner: Omit<Banner, "id">): Promise<Banner> {
+  const db = await readDb();
   const newBanner: Banner = { ...banner, id: `b-${Date.now()}` };
   db.banners = [...db.banners, newBanner];
-  writeDb(db);
+  await writeDb(db);
   return newBanner;
 }
 
-export function deleteBanner(id: string): boolean {
-  const db = readDb();
+export async function deleteBanner(id: string): Promise<boolean> {
+  const db = await readDb();
   const before = db.banners.length;
   db.banners = db.banners.filter((b) => b.id !== id);
   if (db.banners.length === before) return false;
-  writeDb(db);
+  await writeDb(db);
   return true;
 }
 
 // Testimonials
-export function getTestimonials(): Testimonial[] {
-  return readDb().testimonials;
+export async function getTestimonials(): Promise<Testimonial[]> {
+  return (await readDb()).testimonials;
 }
 
-export function addTestimonial(testimonial: Omit<Testimonial, "id">): Testimonial {
-  const db = readDb();
+export async function addTestimonial(testimonial: Omit<Testimonial, "id">): Promise<Testimonial> {
+  const db = await readDb();
   const newTestimonial: Testimonial = { ...testimonial, id: `t-${Date.now()}` };
   db.testimonials = [...db.testimonials, newTestimonial];
-  writeDb(db);
+  await writeDb(db);
   return newTestimonial;
 }
 
-export function deleteTestimonial(id: string): boolean {
-  const db = readDb();
+export async function deleteTestimonial(id: string): Promise<boolean> {
+  const db = await readDb();
   const before = db.testimonials.length;
   db.testimonials = db.testimonials.filter((t) => t.id !== id);
   if (db.testimonials.length === before) return false;
-  writeDb(db);
+  await writeDb(db);
   return true;
 }
 
 // Store Settings
-export function getSettings(): StoreSettings {
-  return readDb().settings;
+export async function getSettings(): Promise<StoreSettings> {
+  return (await readDb()).settings;
 }
 
-export function updateSettings(updates: Partial<StoreSettings>): StoreSettings {
-  const db = readDb();
+export async function updateSettings(updates: Partial<StoreSettings>): Promise<StoreSettings> {
+  const db = await readDb();
   db.settings = { ...db.settings, ...updates };
-  writeDb(db);
+  await writeDb(db);
   return db.settings;
 }
 
 // Dashboard stats and dynamic activity feed
-export function getDashboardStats() {
-  const db = readDb();
+export async function getDashboardStats() {
+  const db = await readDb();
   const totalRevenue = db.orders.reduce((sum, o) => sum + o.total, 0);
   const totalOrders = db.orders.length;
   const totalCustomers = db.customers.length;
@@ -325,11 +390,11 @@ export function getDashboardStats() {
   return { totalRevenue, totalOrders, totalCustomers, avgOrder, recentOrders, topProducts, activities };
 }
 
-export function addOrder(
+export async function addOrder(
   order: Omit<Order, "id" | "date" | "status">,
   purchasedItems?: { id: string; qty: number }[]
-): Order {
-  const db = readDb();
+): Promise<Order> {
+  const db = await readDb();
   
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const now = new Date();
@@ -369,15 +434,15 @@ export function addOrder(
     });
   }
   
-  writeDb(db);
+  await writeDb(db);
   return newOrder;
 }
 
-export function incrementCouponUses(code: string): boolean {
-  const db = readDb();
+export async function incrementCouponUses(code: string): Promise<boolean> {
+  const db = await readDb();
   const idx = db.coupons.findIndex((c) => c.code.toUpperCase() === code.toUpperCase());
   if (idx === -1) return false;
   db.coupons[idx].uses += 1;
-  writeDb(db);
+  await writeDb(db);
   return true;
 }

@@ -10,14 +10,14 @@ import type { StoreSettings } from "@/lib/db";
 
 export const getSettingsFn = createServerFn({ method: "GET" }).handler(async () => {
   const { getSettings } = await import("@/lib/db");
-  return getSettings();
+  return await getSettings();
 });
 
 export const updateSettingsFn = createServerFn({ method: "POST" })
   .inputValidator((data: Partial<StoreSettings>) => data)
   .handler(async ({ data }) => {
     const { updateSettings } = await import("@/lib/db");
-    return updateSettings(data);
+    return await updateSettings(data);
   });
 
 // ─── Route ────────────────────────────────────────────────────────────────────

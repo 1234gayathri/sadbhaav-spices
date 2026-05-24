@@ -9,14 +9,14 @@ import { StatusBadge } from "./admin.index";
 
 export const getOrdersFn = createServerFn({ method: "GET" }).handler(async () => {
   const { getOrders } = await import("@/lib/db");
-  return getOrders();
+  return await getOrders();
 });
 
 export const updateOrderStatusFn = createServerFn({ method: "POST" })
   .inputValidator((data: { id: string; status: string }) => data)
   .handler(async ({ data }) => {
     const { updateOrderStatus } = await import("@/lib/db");
-    return updateOrderStatus(data.id, data.status);
+    return await updateOrderStatus(data.id, data.status);
   });
 
 // ─── Route ────────────────────────────────────────────────────────────────────

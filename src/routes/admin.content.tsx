@@ -8,35 +8,35 @@ import { Image as ImageIcon, MessageSquare, Trash2, ImagePlus, Plus, X } from "l
 
 export const getContentFn = createServerFn({ method: "GET" }).handler(async () => {
   const { getBanners, getTestimonials } = await import("@/lib/db");
-  return { banners: getBanners(), testimonials: getTestimonials() };
+  return { banners: await getBanners(), testimonials: await getTestimonials() };
 });
 
 export const addBannerFn = createServerFn({ method: "POST" })
   .inputValidator((data: { text: string; image: string }) => data)
   .handler(async ({ data }) => {
     const { addBanner } = await import("@/lib/db");
-    return addBanner({ text: data.text, image: data.image });
+    return await addBanner({ text: data.text, image: data.image });
   });
 
 export const deleteBannerFn = createServerFn({ method: "POST" })
   .inputValidator((id: string) => id)
   .handler(async ({ data: id }) => {
     const { deleteBanner } = await import("@/lib/db");
-    return deleteBanner(id);
+    return await deleteBanner(id);
   });
 
 export const addTestimonialFn = createServerFn({ method: "POST" })
   .inputValidator((data: { name: string; quote: string }) => data)
   .handler(async ({ data }) => {
     const { addTestimonial } = await import("@/lib/db");
-    return addTestimonial(data);
+    return await addTestimonial(data);
   });
 
 export const deleteTestimonialFn = createServerFn({ method: "POST" })
   .inputValidator((id: string) => id)
   .handler(async ({ data: id }) => {
     const { deleteTestimonial } = await import("@/lib/db");
-    return deleteTestimonial(id);
+    return await deleteTestimonial(id);
   });
 
 // ─── Route ────────────────────────────────────────────────────────────────────

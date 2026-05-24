@@ -13,10 +13,10 @@ export const getCustomerOrdersFn = createServerFn({ method: "POST" })
     const emailLower = email.toLowerCase().trim();
 
     // Find customer stats
-    const customer = getCustomers().find((c) => c.email.toLowerCase() === emailLower);
+    const customer = (await getCustomers()).find((c) => c.email.toLowerCase() === emailLower);
 
     // Find matching orders
-    const orders = getOrders().filter((o) => (o.email || "").toLowerCase() === emailLower);
+    const orders = (await getOrders()).filter((o) => (o.email || "").toLowerCase() === emailLower);
 
     return { customer: customer || null, orders };
   });

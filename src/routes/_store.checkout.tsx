@@ -9,7 +9,7 @@ import { useCart } from "@/lib/cart";
 
 export const getCheckoutSettingsFn = createServerFn({ method: "GET" }).handler(async () => {
   const { getSettings } = await import("@/lib/db");
-  return getSettings();
+  return await getSettings();
 });
 
 export const validateCouponFn = createServerFn({ method: "POST" })
@@ -17,7 +17,7 @@ export const validateCouponFn = createServerFn({ method: "POST" })
   .handler(async ({ data }: { data: string }) => {
     const code = data;
     const { getCoupons } = await import("@/lib/db");
-    const coupons = getCoupons();
+    const coupons = await getCoupons();
     const found = coupons.find((c) => c.code.toUpperCase() === code.toUpperCase());
     if (!found) {
       return { valid: false, message: "Invalid coupon code" };
@@ -53,9 +53,9 @@ export const placeOrderFn = createServerFn({ method: "POST" })
   .inputValidator((data: PlaceOrderInput) => data)
   .handler(async ({ data }: { data: PlaceOrderInput }) => {
     const { addOrder, incrementCouponUses } = await import("@/lib/db");
-    const order = addOrder(data.order, data.items);
+    const order = await addOrder(data.order, data.items);
     if (data.couponCode) {
-      incrementCouponUses(data.couponCode);
+      await incrementCouponUses(data.couponCode);
     }
     return order;
   });

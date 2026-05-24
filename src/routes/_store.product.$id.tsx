@@ -11,7 +11,7 @@ export const getClientProductFn = createServerFn({ method: "GET" })
   .inputValidator((id: string) => id)
   .handler(async ({ data: id }) => {
     const { getProducts } = await import("@/lib/db");
-    const all = getProducts() as Product[];
+    const all = (await getProducts()) as Product[];
     const p = all.find((x: Product) => x.id === id);
     return { product: p || null, all };
   });

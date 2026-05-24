@@ -9,28 +9,28 @@ import type { Product } from "@/lib/products";
 
 export const getProductsFn = createServerFn({ method: "GET" }).handler(async () => {
   const { getProducts } = await import("@/lib/db");
-  return getProducts();
+  return await getProducts();
 });
 
 export const addProductFn = createServerFn({ method: "POST" })
   .inputValidator((data: Omit<Product, "id">) => data)
   .handler(async ({ data }) => {
     const { addProduct } = await import("@/lib/db");
-    return addProduct(data);
+    return await addProduct(data);
   });
 
 export const updateProductFn = createServerFn({ method: "POST" })
   .inputValidator((data: { id: string; updates: Partial<Product> }) => data)
   .handler(async ({ data }) => {
     const { updateProduct } = await import("@/lib/db");
-    return updateProduct(data.id, data.updates);
+    return await updateProduct(data.id, data.updates);
   });
 
 export const deleteProductFn = createServerFn({ method: "POST" })
   .inputValidator((id: string) => id)
   .handler(async ({ data: id }) => {
     const { deleteProduct } = await import("@/lib/db");
-    return deleteProduct(id);
+    return await deleteProduct(id);
   });
 
 // ─── Route ────────────────────────────────────────────────────────────────────

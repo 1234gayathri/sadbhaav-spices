@@ -18,7 +18,7 @@ const CATEGORY_IMAGES: Record<string, string> = {
 
 export const getClientHomeFn = createServerFn({ method: "GET" }).handler(async () => {
   const { getProducts, getTestimonials, getBanners, getCoupons } = await import("@/lib/db");
-  const coupons = getCoupons().filter((c) => {
+  const coupons = (await getCoupons()).filter((c) => {
     if (!c.active) return false;
     if (c.uses >= c.maxUses) return false;
     const exp = new Date(c.expiry);
@@ -26,9 +26,9 @@ export const getClientHomeFn = createServerFn({ method: "GET" }).handler(async (
     return true;
   });
   return {
-    products: getProducts(),
-    testimonials: getTestimonials(),
-    banners: getBanners(),
+    products: await getProducts(),
+    testimonials: await getTestimonials(),
+    banners: await getBanners(),
     coupons,
   };
 });

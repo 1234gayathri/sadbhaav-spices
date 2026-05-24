@@ -20,8 +20,8 @@ const nav = [
 
 export const getAdminHeaderDataFn = createServerFn({ method: "GET" }).handler(async () => {
   const { getSettings, getOrders } = await import("@/lib/db");
-  const settings = getSettings();
-  const pendingOrders = getOrders().filter((o) => o.status === "Pending").length;
+  const settings = await getSettings();
+  const pendingOrders = (await getOrders()).filter((o) => o.status === "Pending").length;
   return { email: settings.email, pendingOrders };
 });
 

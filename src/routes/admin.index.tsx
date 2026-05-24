@@ -8,7 +8,7 @@ import { AdminShell } from "@/components/admin/AdminShell";
 
 export const getDashboardFn = createServerFn({ method: "GET" }).handler(async () => {
   const { getDashboardStats } = await import("@/lib/db");
-  return getDashboardStats();
+  return await getDashboardStats();
 });
 
 // ─── Route ────────────────────────────────────────────────────────────────────

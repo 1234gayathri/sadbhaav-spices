@@ -11,7 +11,7 @@ export const trackOrderFn = createServerFn({ method: "POST" })
   .handler(async ({ data: orderId }) => {
     const { getOrders } = await import("@/lib/db");
     const idClean = orderId.toUpperCase().trim();
-    const order = getOrders().find((o) => o.id === idClean);
+    const order = (await getOrders()).find((o) => o.id === idClean);
     return order || null;
   });
 

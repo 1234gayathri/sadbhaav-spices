@@ -15,7 +15,7 @@ const CATEGORY_IMAGES: Record<string, string> = {
 
 export const getShopProductsFn = createServerFn({ method: "GET" }).handler(async () => {
   const { getProducts } = await import("@/lib/db");
-  return getProducts();
+  return await getProducts();
 });
 
 export const Route = createFileRoute("/_store/shop")({
