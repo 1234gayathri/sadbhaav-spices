@@ -21,8 +21,10 @@ export const getClientHomeFn = createServerFn({ method: "GET" }).handler(async (
   const coupons = (await getCoupons()).filter((c) => {
     if (!c.active) return false;
     if (c.uses >= c.maxUses) return false;
-    const exp = new Date(c.expiry);
-    if (!isNaN(exp.getTime()) && exp < new Date()) return false;
+    if (c.expiry) {
+      const exp = new Date(c.expiry);
+      if (!isNaN(exp.getTime()) && exp < new Date()) return false;
+    }
     return true;
   });
   return {
@@ -154,7 +156,7 @@ function ClientHome() {
           <Section title="Best sellers" subtitle="Loved by our customers">
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {products.slice(0, 3).map((p) => (
-                <ProductCard key={p.id} p={{ ...p, image: CATEGORY_IMAGES[p.category] || p.image }} />
+                <ProductCard key={p.id} p={{ ...p, image: p.image || CATEGORY_IMAGES[p.category] }} />
               ))}
             </div>
           </Section>
@@ -185,7 +187,7 @@ function ClientHome() {
           <Section title="Trending" subtitle="What's flying off our shelves">
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {products.slice(3, 6).map((p) => (
-                <ProductCard key={p.id} p={{ ...p, image: CATEGORY_IMAGES[p.category] || p.image }} />
+                <ProductCard key={p.id} p={{ ...p, image: p.image || CATEGORY_IMAGES[p.category] }} />
               ))}
             </div>
           </Section>

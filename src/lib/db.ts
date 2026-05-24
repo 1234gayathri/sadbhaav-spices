@@ -9,7 +9,8 @@
  */
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
-import { resolve } from "node:path";
+import { resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import type { Product } from "./products";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -37,8 +38,8 @@ export type Customer = {
 
 export type Coupon = {
   code: string;
-  discount: number;
-  type: "percent" | "flat";
+  description: string;
+  maxUses: number;
   expiry?: string;
   uses: number;
   active: boolean;
@@ -46,17 +47,14 @@ export type Coupon = {
 
 export type Banner = {
   id: string;
-  title: string;
-  subtitle?: string;
+  text: string;
   image: string;
-  discount?: string;
 };
 
 export type Testimonial = {
   id: string;
   name: string;
-  text: string;
-  rating: number;
+  quote: string;
 };
 
 export type StoreSettings = {
@@ -103,7 +101,8 @@ const SEED: DbSchema = {
 
 // ─── File Path ────────────────────────────────────────────────────────────────
 
-const DATA_DIR = resolve(process.cwd(), "data");
+const CURRENT_FILE_DIR = dirname(fileURLToPath(import.meta.url));
+const DATA_DIR = resolve(CURRENT_FILE_DIR, "../../data");
 const DB_FILE = resolve(DATA_DIR, "db.json");
 
 // ─── In-Memory Cache ──────────────────────────────────────────────────────────
