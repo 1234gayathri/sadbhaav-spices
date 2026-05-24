@@ -97,7 +97,12 @@ const SEED: DbSchema = {
 
 // ─── File Path ────────────────────────────────────────────────────────────────
 
-const DATA_DIR = resolve(process.cwd(), "data");
+// In production on Render, use the mounted persistent disk at /data.
+// In local dev, fall back to the project's own data/ folder.
+const DATA_DIR =
+  process.env.NODE_ENV === "production"
+    ? "/data"
+    : resolve(process.cwd(), "data");
 const DB_FILE = resolve(DATA_DIR, "db.json");
 
 // ─── Read / Write ─────────────────────────────────────────────────────────────
