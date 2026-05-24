@@ -15,7 +15,7 @@ export function ProductCard({ p }: { p: Product }) {
       transition={{ type: "spring", stiffness: 260, damping: 22 }}
       className="group relative overflow-hidden rounded-2xl border bg-card shadow-soft transition hover:shadow-elegant"
     >
-      <Link to="/client/product/$id" params={{ id: p.id }} className="block">
+      <Link to="/product/$id" params={{ id: p.id }} className="block">
         <div className="relative aspect-square overflow-hidden bg-muted">
           <img src={p.image} alt={p.name} loading="lazy" width={1024} height={1024}
             className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
@@ -35,7 +35,7 @@ export function ProductCard({ p }: { p: Product }) {
       </Link>
       <div className="p-4">
         <div className="text-[11px] uppercase tracking-wider text-muted-foreground">{p.category}</div>
-        <Link to="/client/product/$id" params={{ id: p.id }}>
+        <Link to="/product/$id" params={{ id: p.id }}>
           <h3 className="mt-1 font-display text-base font-semibold leading-tight line-clamp-1">{p.name}</h3>
         </Link>
         <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">

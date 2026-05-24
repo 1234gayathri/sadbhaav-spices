@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { getShopProductsFn } from "./client.shop";
+import { getShopProductsFn } from "./_store.shop";
 import { useCart } from "@/lib/cart";
 import { ProductCard } from "@/components/client/ProductCard";
 import { Heart } from "lucide-react";
 
-export const Route = createFileRoute("/client/wishlist")({
+export const Route = createFileRoute("/_store/wishlist")({
   component: WishlistPage,
   loader: () => getShopProductsFn(),
   head: () => ({ meta: [{ title: "My Wishlist — Sadbhaav Spices" }] }),
@@ -34,7 +34,7 @@ function WishlistPage() {
             Explore our curated selection of farm-fresh spices and add your favorites here.
           </p>
           <Link
-            to="/client/shop"
+            to="/shop"
             className="mt-6 rounded-full bg-foreground px-6 py-3 text-sm font-semibold text-background hover:opacity-90 transition"
           >
             Explore Spices

@@ -48,6 +48,9 @@ function Orders() {
 
   const handleStatusChange = async (id: string, status: string) => {
     await updateOrderStatusFn({ data: { id, status } });
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("admin-data-update"));
+    }
     await router.invalidate();
   };
 

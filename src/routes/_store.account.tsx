@@ -23,7 +23,7 @@ export const getCustomerOrdersFn = createServerFn({ method: "POST" })
 
 // ─── Route ────────────────────────────────────────────────────────────────────
 
-export const Route = createFileRoute("/client/account")({
+export const Route = createFileRoute("/_store/account")({
   component: AccountPage,
   head: () => ({ meta: [{ title: "My Account — Sadbhaav Spices" }] }),
 });
@@ -175,7 +175,7 @@ function AccountPage() {
             {profile.orders.length === 0 ? (
               <div className="text-center py-16 px-6">
                 <p className="text-muted-foreground text-sm">No orders recorded for this profile yet.</p>
-                <Link to="/client/shop" className="mt-4 inline-flex items-center gap-1 text-primary text-sm font-semibold underline">
+                <Link to="/shop" className="mt-4 inline-flex items-center gap-1 text-primary text-sm font-semibold underline">
                   Start shopping now <ArrowRight className="h-3 w-3" />
                 </Link>
               </div>

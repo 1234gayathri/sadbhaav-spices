@@ -33,7 +33,7 @@ export const getClientHomeFn = createServerFn({ method: "GET" }).handler(async (
   };
 });
 
-export const Route = createFileRoute("/client/")({
+export const Route = createFileRoute("/_store/")({
   component: ClientHome,
   loader: () => getClientHomeFn(),
   head: () => ({ meta: [{ title: "Sadbhaav Spices — Store" }] }),
@@ -65,10 +65,10 @@ function ClientHome() {
               Stone-ground turmeric, sun-dried chillies and highland cardamom — delivered to your kitchen, fresh from ours.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link to="/client/shop" className="inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-3 text-sm font-semibold text-background hover:opacity-90 transition">
+              <Link to="/shop" className="inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-3 text-sm font-semibold text-background hover:opacity-90 transition">
                 Shop the collection <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link to="/client/shop" className="inline-flex items-center gap-2 rounded-full border px-6 py-3 text-sm font-semibold hover:bg-accent/5 transition">
+              <Link to="/shop" className="inline-flex items-center gap-2 rounded-full border px-6 py-3 text-sm font-semibold hover:bg-accent/5 transition">
                 New arrivals
               </Link>
             </div>
@@ -127,7 +127,7 @@ function ClientHome() {
       <section className="border-y bg-card/40 py-8">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-3 px-6">
           {["All", "Turmeric", "Chilli", "Cardamom", "Best Sellers", "New"].map((c) => (
-            <Link key={c} to="/client/shop" className="rounded-full border bg-background px-5 py-2 text-sm font-medium hover:border-primary hover:text-primary transition">
+            <Link key={c} to="/shop" className="rounded-full border bg-background px-5 py-2 text-sm font-medium hover:border-primary hover:text-primary transition">
               {c}
             </Link>
           ))}
@@ -171,7 +171,7 @@ function ClientHome() {
                     Use code <span className="font-mono font-bold">{activeCoupon.code}</span> at checkout.
                   </p>
                   <Link
-                    to="/client/shop"
+                    to="/shop"
                     className="mt-6 inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-3 text-sm font-semibold text-background hover:opacity-90 transition"
                   >
                     Shop now <ArrowRight className="h-4 w-4" />
@@ -274,7 +274,7 @@ function Section({ title, subtitle, children }: { title: string; subtitle?: stri
             <h2 className="font-display text-4xl font-semibold tracking-tight">{title}</h2>
             {subtitle && <p className="mt-1 text-muted-foreground">{subtitle}</p>}
           </div>
-          <Link to="/client/shop" className="text-sm font-medium underline-offset-4 hover:underline">View all →</Link>
+          <Link to="/shop" className="text-sm font-medium underline-offset-4 hover:underline">View all →</Link>
         </div>
         {children}
       </div>

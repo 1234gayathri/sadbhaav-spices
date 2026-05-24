@@ -18,7 +18,7 @@ export const getShopProductsFn = createServerFn({ method: "GET" }).handler(async
   return getProducts();
 });
 
-export const Route = createFileRoute("/client/shop")({
+export const Route = createFileRoute("/_store/shop")({
   component: Shop,
   loader: () => getShopProductsFn(),
   validateSearch: (s: Record<string, unknown>): { cat?: string; q?: string } => ({

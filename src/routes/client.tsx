@@ -1,18 +1,7 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { ClientNav, ClientFooter } from "@/components/client/Nav";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/client")({
-  component: ClientLayout,
+  loader: () => {
+    throw redirect({ to: "/", replace: true });
+  },
 });
-
-function ClientLayout() {
-  return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <ClientNav />
-      <main className="flex-1">
-        <Outlet />
-      </main>
-      <ClientFooter />
-    </div>
-  );
-}

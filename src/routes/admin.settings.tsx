@@ -65,6 +65,9 @@ function SettingsPage() {
           currency,
         },
       });
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("admin-data-update"));
+      }
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
       await router.invalidate();

@@ -17,7 +17,7 @@ export const trackOrderFn = createServerFn({ method: "POST" })
 
 // ─── Route ────────────────────────────────────────────────────────────────────
 
-export const Route = createFileRoute("/client/track")({
+export const Route = createFileRoute("/_store/track")({
   component: TrackPage,
   head: () => ({ meta: [{ title: "Track My Order — Sadbhaav Spices" }] }),
 });
@@ -115,7 +115,7 @@ function TrackPage() {
             We couldn't find an order matching <span className="font-mono font-semibold">{orderIdInput.toUpperCase()}</span>. Please verify your receipt or search in your profile.
           </p>
           <Link
-            to="/client/account"
+            to="/account"
             className="mt-5 text-xs text-primary underline font-semibold flex items-center gap-1"
           >
             Go to Profile Lookup <ArrowRight className="h-3 w-3" />
@@ -136,7 +136,7 @@ function TrackPage() {
                 <span className="text-xs text-muted-foreground">Status</span>
                 <div className="mt-0.5">
                   <span
-                    className={`inline-flex items-center gap-1 rounded-full px-3 py-0.5 text-xs font-semibold ${
+                    className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
                       order.status === "Delivered"
                         ? "bg-emerald-100 text-emerald-800"
                         : order.status === "Cancelled"

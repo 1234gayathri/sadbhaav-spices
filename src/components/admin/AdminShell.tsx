@@ -1,5 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { createServerFn } from "@tanstack/react-start";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   LayoutDashboard, Package, ShoppingCart, Users, Tag, Image as ImageIcon,
   Settings, Bell, Search, Menu, X, ArrowLeft, Lock
@@ -17,6 +18,13 @@ const nav = [
   { to: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
+export const getAdminHeaderDataFn = createServerFn({ method: "GET" }).handler(async () => {
+  const { getSettings, getOrders } = await import("@/lib/db");
+  const settings = getSettings();
+  const pendingOrders = getOrders().filter((o) => o.status === "Pending").length;
+  return { email: settings.email, pendingOrders };
+});
+
 export function AdminShell({ children, title, subtitle }: { children: React.ReactNode; title: string; subtitle?: string }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
@@ -24,6 +32,20 @@ export function AdminShell({ children, title, subtitle }: { children: React.Reac
   const [pwd, setPwd] = useState("");
   const [err, setErr] = useState("");
   const [mounted, setMounted] = useState(false);
+  
+  const [headerData, setHeaderData] = useState({ email: "Loading...", pendingOrders: 0 });
+
+  const fetchHeaderData = useCallback(() => {
+    if (auth) {
+      getAdminHeaderDataFn().then(setHeaderData).catch((err) => console.error("Error fetching header data:", err));
+    }
+  }, [auth]);
+
+  // Keep a stable ref so the event listener always calls the latest version
+  const fetchHeaderDataRef = useRef(fetchHeaderData);
+  useEffect(() => {
+    fetchHeaderDataRef.current = fetchHeaderData;
+  }, [fetchHeaderData]);
 
   useEffect(() => {
     setMounted(true);
@@ -31,6 +53,22 @@ export function AdminShell({ children, title, subtitle }: { children: React.Reac
       setAuth(true);
     }
   }, []);
+
+  useEffect(() => {
+    fetchHeaderData();
+
+    const handleUpdate = () => {
+      fetchHeaderDataRef.current();
+    };
+
+    window.addEventListener("admin-data-update", handleUpdate);
+    const interval = setInterval(() => fetchHeaderDataRef.current(), 4000);
+
+    return () => {
+      window.removeEventListener("admin-data-update", handleUpdate);
+      clearInterval(interval);
+    };
+  }, [auth, path]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -116,13 +154,17 @@ export function AdminShell({ children, title, subtitle }: { children: React.Reac
               <ThemeToggle />
               <button className="relative p-2 rounded-full hover:bg-accent/10" aria-label="Notifications">
                 <Bell className="h-5 w-5" />
-                <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-accent" />
+                {headerData.pendingOrders > 0 && (
+                  <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[8px] font-bold text-accent-foreground">
+                    {headerData.pendingOrders}
+                  </span>
+                )}
               </button>
               <div className="ml-2 flex items-center gap-2 pl-3 border-l">
                 <div className="h-8 w-8 rounded-full bg-gradient-warm" />
                 <div className="hidden sm:block">
                   <div className="text-xs font-semibold">Admin</div>
-                  <div className="text-[10px] text-muted-foreground">owner@sadbhaav.in</div>
+                  <div className="text-[10px] text-muted-foreground">{headerData.email}</div>
                 </div>
               </div>
             </div>

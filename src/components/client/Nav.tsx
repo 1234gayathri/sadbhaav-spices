@@ -6,11 +6,11 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { useCart } from "@/lib/cart";
 
 const links = [
-  { to: "/client", label: "Home", exact: true },
-  { to: "/client/shop", label: "Shop" },
-  { to: "/client/shop", label: "Turmeric", search: { cat: "Turmeric" } },
-  { to: "/client/shop", label: "Chilli", search: { cat: "Chilli" } },
-  { to: "/client/shop", label: "Cardamom", search: { cat: "Cardamom" } },
+  { to: "/", label: "Home", exact: true },
+  { to: "/shop", label: "Shop" },
+  { to: "/shop", label: "Turmeric", search: { cat: "Turmeric" } },
+  { to: "/shop", label: "Chilli", search: { cat: "Chilli" } },
+  { to: "/shop", label: "Cardamom", search: { cat: "Cardamom" } },
 ];
 
 export function ClientNav() {
@@ -24,7 +24,7 @@ export function ClientNav() {
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchVal.trim()) {
-      navigate({ to: "/client/shop", search: { q: searchVal.trim() } });
+      navigate({ to: "/shop", search: { q: searchVal.trim() } });
       setShowSearch(false);
       setSearchVal("");
       setOpen(false);
@@ -34,7 +34,7 @@ export function ClientNav() {
   return (
     <header className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center gap-4 px-6 py-3.5">
-        <Logo to="/client" />
+        <Logo to="/" />
         <nav className="ml-6 hidden lg:flex items-center gap-1">
           {links.slice(0, 2).map((l) => (
             <Link
@@ -89,16 +89,16 @@ export function ClientNav() {
             </button>
           )}
           <ThemeToggle />
-          <Link to="/client/track" className="hidden md:inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-accent/10 transition" aria-label="Track Order">
+          <Link to="/track" className="hidden md:inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-accent/10 transition" aria-label="Track Order">
             <Package className="h-4.5 w-4.5" />
           </Link>
-          <Link to="/client/account" className="hidden md:inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-accent/10 transition" aria-label="Account">
+          <Link to="/account" className="hidden md:inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-accent/10 transition" aria-label="Account">
             <User className="h-4.5 w-4.5" />
           </Link>
-          <Link to="/client/wishlist" className="hidden md:inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-accent/10 transition" aria-label="Wishlist">
+          <Link to="/wishlist" className="hidden md:inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-accent/10 transition" aria-label="Wishlist">
             <Heart className="h-4.5 w-4.5" />
           </Link>
-          <Link to="/client/checkout" className="relative inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-accent/10 transition" aria-label="Cart">
+          <Link to="/checkout" className="relative inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-accent/10 transition" aria-label="Cart">
             <ShoppingCart className="h-4.5 w-4.5" />
             {count > 0 && (
               <span className="absolute -right-0.5 -top-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-accent-foreground">
@@ -130,9 +130,9 @@ export function ClientNav() {
                 {l.label}
               </Link>
             ))}
-            <Link to="/client/track" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition">Track Order</Link>
-            <Link to="/client/account" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition">Account</Link>
-            <Link to="/client/wishlist" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition">Wishlist</Link>
+            <Link to="/track" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition">Track Order</Link>
+            <Link to="/account" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition">Account</Link>
+            <Link to="/wishlist" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition">Wishlist</Link>
           </div>
         </div>
       )}
@@ -145,14 +145,14 @@ export function ClientFooter() {
     <footer className="mt-16 border-t bg-card/40">
       <div className="mx-auto grid max-w-7xl gap-10 px-6 py-14 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <Logo to="/client" />
+          <Logo to="/" />
           <p className="mt-4 text-sm text-muted-foreground max-w-xs">
             Pure spices. Authentic taste. Sourced direct from Indian farms with love and care.
           </p>
         </div>
-        <FooterCol title="Shop" links={[["All Products","/client/shop"],["Turmeric","/client/shop"],["Chilli","/client/shop"],["Cardamom","/client/shop"]]} />
+        <FooterCol title="Shop" links={[["All Products","/shop"],["Turmeric","/shop"],["Chilli","/shop"],["Cardamom","/shop"]]} />
         <FooterCol title="Company" links={[["About","/"],["Contact","/"],["Sustainability","/"],["Blog","/"]]} />
-        <FooterCol title="Help" links={[["Track Order","/client/track"],["Returns","/"],["FAQs","/"]]} />
+        <FooterCol title="Help" links={[["Track Order","/track"],["Returns","/"],["FAQs","/"]]} />
       </div>
       <div className="border-t py-5 text-center text-xs text-muted-foreground">
         © {new Date().getFullYear()} Sadbhaav Spices Co. · Crafted in India

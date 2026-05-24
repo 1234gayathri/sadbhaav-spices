@@ -10,65 +10,45 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ClientRouteImport } from './routes/client'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as ClientIndexRouteImport } from './routes/client.index'
+import { Route as StoreRouteImport } from './routes/_store'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as ClientWishlistRouteImport } from './routes/client.wishlist'
-import { Route as ClientTrackRouteImport } from './routes/client.track'
-import { Route as ClientShopRouteImport } from './routes/client.shop'
-import { Route as ClientCheckoutRouteImport } from './routes/client.checkout'
-import { Route as ClientAccountRouteImport } from './routes/client.account'
+import { Route as StoreIndexRouteImport } from './routes/_store.index'
+import { Route as ClientSplatRouteImport } from './routes/client.$'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminProductsRouteImport } from './routes/admin.products'
 import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as AdminOffersRouteImport } from './routes/admin.offers'
 import { Route as AdminCustomersRouteImport } from './routes/admin.customers'
 import { Route as AdminContentRouteImport } from './routes/admin.content'
-import { Route as ClientProductIdRouteImport } from './routes/client.product.$id'
+import { Route as StoreWishlistRouteImport } from './routes/_store.wishlist'
+import { Route as StoreTrackRouteImport } from './routes/_store.track'
+import { Route as StoreShopRouteImport } from './routes/_store.shop'
+import { Route as StoreCheckoutRouteImport } from './routes/_store.checkout'
+import { Route as StoreAccountRouteImport } from './routes/_store.account'
+import { Route as StoreProductIdRouteImport } from './routes/_store.product.$id'
 
 const ClientRoute = ClientRouteImport.update({
   id: '/client',
   path: '/client',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const StoreRoute = StoreRouteImport.update({
+  id: '/_store',
   getParentRoute: () => rootRouteImport,
-} as any)
-const ClientIndexRoute = ClientIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => ClientRoute,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ClientWishlistRoute = ClientWishlistRouteImport.update({
-  id: '/wishlist',
-  path: '/wishlist',
-  getParentRoute: () => ClientRoute,
+const StoreIndexRoute = StoreIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => StoreRoute,
 } as any)
-const ClientTrackRoute = ClientTrackRouteImport.update({
-  id: '/track',
-  path: '/track',
-  getParentRoute: () => ClientRoute,
-} as any)
-const ClientShopRoute = ClientShopRouteImport.update({
-  id: '/shop',
-  path: '/shop',
-  getParentRoute: () => ClientRoute,
-} as any)
-const ClientCheckoutRoute = ClientCheckoutRouteImport.update({
-  id: '/checkout',
-  path: '/checkout',
-  getParentRoute: () => ClientRoute,
-} as any)
-const ClientAccountRoute = ClientAccountRouteImport.update({
-  id: '/account',
-  path: '/account',
+const ClientSplatRoute = ClientSplatRouteImport.update({
+  id: '/$',
+  path: '/$',
   getParentRoute: () => ClientRoute,
 } as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
@@ -101,124 +81,153 @@ const AdminContentRoute = AdminContentRouteImport.update({
   path: '/admin/content',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ClientProductIdRoute = ClientProductIdRouteImport.update({
+const StoreWishlistRoute = StoreWishlistRouteImport.update({
+  id: '/wishlist',
+  path: '/wishlist',
+  getParentRoute: () => StoreRoute,
+} as any)
+const StoreTrackRoute = StoreTrackRouteImport.update({
+  id: '/track',
+  path: '/track',
+  getParentRoute: () => StoreRoute,
+} as any)
+const StoreShopRoute = StoreShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
+  getParentRoute: () => StoreRoute,
+} as any)
+const StoreCheckoutRoute = StoreCheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => StoreRoute,
+} as any)
+const StoreAccountRoute = StoreAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => StoreRoute,
+} as any)
+const StoreProductIdRoute = StoreProductIdRouteImport.update({
   id: '/product/$id',
   path: '/product/$id',
-  getParentRoute: () => ClientRoute,
+  getParentRoute: () => StoreRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof StoreIndexRoute
   '/client': typeof ClientRouteWithChildren
+  '/account': typeof StoreAccountRoute
+  '/checkout': typeof StoreCheckoutRoute
+  '/shop': typeof StoreShopRoute
+  '/track': typeof StoreTrackRoute
+  '/wishlist': typeof StoreWishlistRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/customers': typeof AdminCustomersRoute
   '/admin/offers': typeof AdminOffersRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/settings': typeof AdminSettingsRoute
-  '/client/account': typeof ClientAccountRoute
-  '/client/checkout': typeof ClientCheckoutRoute
-  '/client/shop': typeof ClientShopRoute
-  '/client/track': typeof ClientTrackRoute
-  '/client/wishlist': typeof ClientWishlistRoute
+  '/client/$': typeof ClientSplatRoute
   '/admin/': typeof AdminIndexRoute
-  '/client/': typeof ClientIndexRoute
-  '/client/product/$id': typeof ClientProductIdRoute
+  '/product/$id': typeof StoreProductIdRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/client': typeof ClientRouteWithChildren
+  '/account': typeof StoreAccountRoute
+  '/checkout': typeof StoreCheckoutRoute
+  '/shop': typeof StoreShopRoute
+  '/track': typeof StoreTrackRoute
+  '/wishlist': typeof StoreWishlistRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/customers': typeof AdminCustomersRoute
   '/admin/offers': typeof AdminOffersRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/settings': typeof AdminSettingsRoute
-  '/client/account': typeof ClientAccountRoute
-  '/client/checkout': typeof ClientCheckoutRoute
-  '/client/shop': typeof ClientShopRoute
-  '/client/track': typeof ClientTrackRoute
-  '/client/wishlist': typeof ClientWishlistRoute
+  '/client/$': typeof ClientSplatRoute
+  '/': typeof StoreIndexRoute
   '/admin': typeof AdminIndexRoute
-  '/client': typeof ClientIndexRoute
-  '/client/product/$id': typeof ClientProductIdRoute
+  '/product/$id': typeof StoreProductIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_store': typeof StoreRouteWithChildren
   '/client': typeof ClientRouteWithChildren
+  '/_store/account': typeof StoreAccountRoute
+  '/_store/checkout': typeof StoreCheckoutRoute
+  '/_store/shop': typeof StoreShopRoute
+  '/_store/track': typeof StoreTrackRoute
+  '/_store/wishlist': typeof StoreWishlistRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/customers': typeof AdminCustomersRoute
   '/admin/offers': typeof AdminOffersRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/settings': typeof AdminSettingsRoute
-  '/client/account': typeof ClientAccountRoute
-  '/client/checkout': typeof ClientCheckoutRoute
-  '/client/shop': typeof ClientShopRoute
-  '/client/track': typeof ClientTrackRoute
-  '/client/wishlist': typeof ClientWishlistRoute
+  '/client/$': typeof ClientSplatRoute
+  '/_store/': typeof StoreIndexRoute
   '/admin/': typeof AdminIndexRoute
-  '/client/': typeof ClientIndexRoute
-  '/client/product/$id': typeof ClientProductIdRoute
+  '/_store/product/$id': typeof StoreProductIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/client'
+    | '/account'
+    | '/checkout'
+    | '/shop'
+    | '/track'
+    | '/wishlist'
     | '/admin/content'
     | '/admin/customers'
     | '/admin/offers'
     | '/admin/orders'
     | '/admin/products'
     | '/admin/settings'
-    | '/client/account'
-    | '/client/checkout'
-    | '/client/shop'
-    | '/client/track'
-    | '/client/wishlist'
+    | '/client/$'
     | '/admin/'
-    | '/client/'
-    | '/client/product/$id'
+    | '/product/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
+    | '/client'
+    | '/account'
+    | '/checkout'
+    | '/shop'
+    | '/track'
+    | '/wishlist'
     | '/admin/content'
     | '/admin/customers'
     | '/admin/offers'
     | '/admin/orders'
     | '/admin/products'
     | '/admin/settings'
-    | '/client/account'
-    | '/client/checkout'
-    | '/client/shop'
-    | '/client/track'
-    | '/client/wishlist'
+    | '/client/$'
+    | '/'
     | '/admin'
-    | '/client'
-    | '/client/product/$id'
+    | '/product/$id'
   id:
     | '__root__'
-    | '/'
+    | '/_store'
     | '/client'
+    | '/_store/account'
+    | '/_store/checkout'
+    | '/_store/shop'
+    | '/_store/track'
+    | '/_store/wishlist'
     | '/admin/content'
     | '/admin/customers'
     | '/admin/offers'
     | '/admin/orders'
     | '/admin/products'
     | '/admin/settings'
-    | '/client/account'
-    | '/client/checkout'
-    | '/client/shop'
-    | '/client/track'
-    | '/client/wishlist'
+    | '/client/$'
+    | '/_store/'
     | '/admin/'
-    | '/client/'
-    | '/client/product/$id'
+    | '/_store/product/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  StoreRoute: typeof StoreRouteWithChildren
   ClientRoute: typeof ClientRouteWithChildren
   AdminContentRoute: typeof AdminContentRoute
   AdminCustomersRoute: typeof AdminCustomersRoute
@@ -238,19 +247,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClientRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
+    '/_store': {
+      id: '/_store'
+      path: ''
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+      preLoaderRoute: typeof StoreRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/client/': {
-      id: '/client/'
-      path: '/'
-      fullPath: '/client/'
-      preLoaderRoute: typeof ClientIndexRouteImport
-      parentRoute: typeof ClientRoute
     }
     '/admin/': {
       id: '/admin/'
@@ -259,39 +261,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/client/wishlist': {
-      id: '/client/wishlist'
-      path: '/wishlist'
-      fullPath: '/client/wishlist'
-      preLoaderRoute: typeof ClientWishlistRouteImport
-      parentRoute: typeof ClientRoute
+    '/_store/': {
+      id: '/_store/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof StoreIndexRouteImport
+      parentRoute: typeof StoreRoute
     }
-    '/client/track': {
-      id: '/client/track'
-      path: '/track'
-      fullPath: '/client/track'
-      preLoaderRoute: typeof ClientTrackRouteImport
-      parentRoute: typeof ClientRoute
-    }
-    '/client/shop': {
-      id: '/client/shop'
-      path: '/shop'
-      fullPath: '/client/shop'
-      preLoaderRoute: typeof ClientShopRouteImport
-      parentRoute: typeof ClientRoute
-    }
-    '/client/checkout': {
-      id: '/client/checkout'
-      path: '/checkout'
-      fullPath: '/client/checkout'
-      preLoaderRoute: typeof ClientCheckoutRouteImport
-      parentRoute: typeof ClientRoute
-    }
-    '/client/account': {
-      id: '/client/account'
-      path: '/account'
-      fullPath: '/client/account'
-      preLoaderRoute: typeof ClientAccountRouteImport
+    '/client/$': {
+      id: '/client/$'
+      path: '/$'
+      fullPath: '/client/$'
+      preLoaderRoute: typeof ClientSplatRouteImport
       parentRoute: typeof ClientRoute
     }
     '/admin/settings': {
@@ -336,41 +317,86 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminContentRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/client/product/$id': {
-      id: '/client/product/$id'
+    '/_store/wishlist': {
+      id: '/_store/wishlist'
+      path: '/wishlist'
+      fullPath: '/wishlist'
+      preLoaderRoute: typeof StoreWishlistRouteImport
+      parentRoute: typeof StoreRoute
+    }
+    '/_store/track': {
+      id: '/_store/track'
+      path: '/track'
+      fullPath: '/track'
+      preLoaderRoute: typeof StoreTrackRouteImport
+      parentRoute: typeof StoreRoute
+    }
+    '/_store/shop': {
+      id: '/_store/shop'
+      path: '/shop'
+      fullPath: '/shop'
+      preLoaderRoute: typeof StoreShopRouteImport
+      parentRoute: typeof StoreRoute
+    }
+    '/_store/checkout': {
+      id: '/_store/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof StoreCheckoutRouteImport
+      parentRoute: typeof StoreRoute
+    }
+    '/_store/account': {
+      id: '/_store/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof StoreAccountRouteImport
+      parentRoute: typeof StoreRoute
+    }
+    '/_store/product/$id': {
+      id: '/_store/product/$id'
       path: '/product/$id'
-      fullPath: '/client/product/$id'
-      preLoaderRoute: typeof ClientProductIdRouteImport
-      parentRoute: typeof ClientRoute
+      fullPath: '/product/$id'
+      preLoaderRoute: typeof StoreProductIdRouteImport
+      parentRoute: typeof StoreRoute
     }
   }
 }
 
+interface StoreRouteChildren {
+  StoreAccountRoute: typeof StoreAccountRoute
+  StoreCheckoutRoute: typeof StoreCheckoutRoute
+  StoreShopRoute: typeof StoreShopRoute
+  StoreTrackRoute: typeof StoreTrackRoute
+  StoreWishlistRoute: typeof StoreWishlistRoute
+  StoreIndexRoute: typeof StoreIndexRoute
+  StoreProductIdRoute: typeof StoreProductIdRoute
+}
+
+const StoreRouteChildren: StoreRouteChildren = {
+  StoreAccountRoute: StoreAccountRoute,
+  StoreCheckoutRoute: StoreCheckoutRoute,
+  StoreShopRoute: StoreShopRoute,
+  StoreTrackRoute: StoreTrackRoute,
+  StoreWishlistRoute: StoreWishlistRoute,
+  StoreIndexRoute: StoreIndexRoute,
+  StoreProductIdRoute: StoreProductIdRoute,
+}
+
+const StoreRouteWithChildren = StoreRoute._addFileChildren(StoreRouteChildren)
+
 interface ClientRouteChildren {
-  ClientAccountRoute: typeof ClientAccountRoute
-  ClientCheckoutRoute: typeof ClientCheckoutRoute
-  ClientShopRoute: typeof ClientShopRoute
-  ClientTrackRoute: typeof ClientTrackRoute
-  ClientWishlistRoute: typeof ClientWishlistRoute
-  ClientIndexRoute: typeof ClientIndexRoute
-  ClientProductIdRoute: typeof ClientProductIdRoute
+  ClientSplatRoute: typeof ClientSplatRoute
 }
 
 const ClientRouteChildren: ClientRouteChildren = {
-  ClientAccountRoute: ClientAccountRoute,
-  ClientCheckoutRoute: ClientCheckoutRoute,
-  ClientShopRoute: ClientShopRoute,
-  ClientTrackRoute: ClientTrackRoute,
-  ClientWishlistRoute: ClientWishlistRoute,
-  ClientIndexRoute: ClientIndexRoute,
-  ClientProductIdRoute: ClientProductIdRoute,
+  ClientSplatRoute: ClientSplatRoute,
 }
 
 const ClientRouteWithChildren =
   ClientRoute._addFileChildren(ClientRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  StoreRoute: StoreRouteWithChildren,
   ClientRoute: ClientRouteWithChildren,
   AdminContentRoute: AdminContentRoute,
   AdminCustomersRoute: AdminCustomersRoute,

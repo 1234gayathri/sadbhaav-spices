@@ -16,7 +16,7 @@ export const getClientProductFn = createServerFn({ method: "GET" })
     return { product: p || null, all };
   });
 
-export const Route = createFileRoute("/client/product/$id")({
+export const Route = createFileRoute("/_store/product/$id")({
   component: ProductDetail,
   loader: async ({ params }) => {
     const res = await getClientProductFn({ data: params.id });
@@ -26,7 +26,7 @@ export const Route = createFileRoute("/client/product/$id")({
   notFoundComponent: () => (
     <div className="mx-auto max-w-2xl px-6 py-32 text-center">
       <h1 className="font-display text-3xl">Product not found</h1>
-      <Link to="/client/shop" className="mt-4 inline-block text-primary underline">Back to shop</Link>
+      <Link to="/shop" className="mt-4 inline-block text-primary underline">Back to shop</Link>
     </div>
   ),
   head: ({ loaderData }) => ({
@@ -45,8 +45,8 @@ function ProductDetail() {
   return (
     <div className="mx-auto max-w-7xl px-6 py-10">
       <nav className="text-xs text-muted-foreground">
-        <Link to="/client" className="hover:text-foreground">Home</Link> /{" "}
-        <Link to="/client/shop" className="hover:text-foreground">Shop</Link> /{" "}
+        <Link to="/" className="hover:text-foreground">Home</Link> /{" "}
+        <Link to="/shop" className="hover:text-foreground">Shop</Link> /{" "}
         <span className="text-foreground">{p.name}</span>
       </nav>
 
@@ -100,7 +100,7 @@ function ProductDetail() {
               <ShoppingBag className="h-4 w-4" /> Add to cart
             </button>
             <button
-              onClick={() => { add(p.id, qty); nav({ to: "/client/checkout" }); }}
+              onClick={() => { add(p.id, qty); nav({ to: "/checkout" }); }}
               className="inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3.5 text-sm font-semibold text-accent-foreground hover:opacity-90 transition"
             >
               Buy now

@@ -98,7 +98,7 @@ function getCouponDiscount(
 
 // ─── Route ────────────────────────────────────────────────────────────────────
 
-export const Route = createFileRoute("/client/checkout")({
+export const Route = createFileRoute("/_store/checkout")({
   component: Checkout,
   loader: () => getCheckoutSettingsFn(),
   head: () => ({ meta: [{ title: "Checkout — Sadbhaav Spices" }] }),
@@ -257,7 +257,7 @@ function Checkout() {
         )}
         <p className="mt-4 text-muted-foreground">We'll send a confirmation to your email shortly.</p>
         <Link
-          to="/client"
+          to="/"
           className="mt-6 inline-flex rounded-full bg-foreground px-6 py-3 text-sm font-semibold text-background hover:opacity-90"
         >
           Back to store
