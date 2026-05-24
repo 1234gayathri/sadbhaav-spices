@@ -1,8 +1,8 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   LayoutDashboard, Package, ShoppingCart, Users, Tag, Image as ImageIcon,
-  Settings, Bell, Search, Menu, X, ArrowLeft
+  Settings, Bell, Search, Menu, X, ArrowLeft, Lock
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -20,6 +20,59 @@ const nav = [
 export function AdminShell({ children, title, subtitle }: { children: React.ReactNode; title: string; subtitle?: string }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
+  const [auth, setAuth] = useState(false);
+  const [pwd, setPwd] = useState("");
+  const [err, setErr] = useState("");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    if (sessionStorage.getItem("admin_auth") === "true") {
+      setAuth(true);
+    }
+  }, []);
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (pwd === "admin@project6878") {
+      sessionStorage.setItem("admin_auth", "true");
+      setAuth(true);
+      setErr("");
+    } else {
+      setErr("Incorrect password");
+    }
+  };
+
+  if (!mounted) return null;
+
+  if (!auth) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-muted/30 p-6">
+        <form onSubmit={handleLogin} className="w-full max-w-sm rounded-3xl border bg-card p-8 shadow-elegant text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-accent/10 mb-6">
+            <Lock className="h-6 w-6 text-accent" />
+          </div>
+          <h1 className="font-display text-2xl font-semibold">Admin Access</h1>
+          <p className="mt-2 text-sm text-muted-foreground mb-6">Enter password to manage your store.</p>
+          <input
+            type="password"
+            value={pwd}
+            onChange={(e) => setPwd(e.target.value)}
+            placeholder="Password"
+            className="w-full rounded-xl border bg-background px-4 py-3 text-sm outline-none focus:border-primary mb-3"
+            autoFocus
+          />
+          {err && <p className="text-xs text-destructive text-left mb-3">{err}</p>}
+          <button type="submit" className="w-full rounded-xl bg-foreground px-4 py-3 text-sm font-semibold text-background hover:opacity-90 transition">
+            Unlock
+          </button>
+          <div className="mt-6">
+            <Link to="/" className="text-xs text-muted-foreground hover:underline">← Back to store</Link>
+          </div>
+        </form>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-muted/30">
