@@ -101,7 +101,7 @@ function Shop() {
         </div>
       ) : (
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {list.map((p) => <ProductCard key={p.id} p={{ ...p, image: CATEGORY_IMAGES[p.category] || p.image }} />)}
+          {list.map((p) => <ProductCard key={p.id} p={{ ...p, image: p.image || CATEGORY_IMAGES[p.category] }} />)}
         </div>
       )}
     </div>
