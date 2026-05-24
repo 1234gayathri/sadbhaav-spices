@@ -287,7 +287,20 @@ export function getCustomers(): Customer[] {
 
 // Coupons
 export function getCoupons(): Coupon[] {
-  return readDb().coupons;
+  const db = readDb();
+  const now = new Date();
+  const before = db.coupons.length;
+  // Auto-delete coupons whose expiry date has passed
+  db.coupons = db.coupons.filter((c) => {
+    if (!c.expiry) return true; // no expiry = keep forever
+    const expDate = new Date(c.expiry);
+    if (isNaN(expDate.getTime())) return true; // invalid date = keep
+    return expDate >= now; // keep only if not yet expired
+  });
+  if (db.coupons.length !== before) {
+    writeDb(db); // only write if something was actually deleted
+  }
+  return db.coupons;
 }
 
 export function addCoupon(coupon: Omit<Coupon, "uses" | "active">): Coupon {
