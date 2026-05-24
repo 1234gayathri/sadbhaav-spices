@@ -144,8 +144,7 @@ function Checkout() {
 
   const isPaymentValid =
     pay === "cod" ||
-    (pay === "upi" && upiId.trim() !== "") ||
-    (pay === "card" && cardNo.trim() !== "" && expiry.trim() !== "" && cvv.trim() !== "");
+    (pay === "upi" && upiId.trim() !== "");
 
   const isFormValid = isPersonalDetailsValid && isPaymentValid && items.length > 0;
 
@@ -347,10 +346,9 @@ function Checkout() {
           </Section>
 
           <Section icon={CreditCard} title="Payment">
-            <div className="grid gap-3 sm:grid-cols-3">
+            <div className="grid gap-3 sm:grid-cols-2">
               {[
                 { id: "upi", l: "UPI" },
-                { id: "card", l: "Card" },
                 { id: "cod", l: "Cash on delivery" },
               ].map((o) => (
                 <button
@@ -367,29 +365,6 @@ function Checkout() {
                 </button>
               ))}
             </div>
-            {pay === "card" && (
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <Input
-                  label="Card number"
-                  className="sm:col-span-2"
-                  placeholder="xxxx xxxx xxxx xxxx"
-                  value={cardNo}
-                  onChange={(e: any) => setCardNo(e.target.value)}
-                />
-                <Input
-                  label="Expiry"
-                  placeholder="MM/YY"
-                  value={expiry}
-                  onChange={(e: any) => setExpiry(e.target.value)}
-                />
-                <Input
-                  label="CVV"
-                  placeholder="xxx"
-                  value={cvv}
-                  onChange={(e: any) => setCvv(e.target.value)}
-                />
-              </div>
-            )}
             {pay === "upi" && (
               <div className="mt-4">
                 <Input
