@@ -3,7 +3,7 @@ services:
     name: sadbhaav-spices
     runtime: node
     buildCommand: npm install && npm run build
-    startCommand: npm start
+    startCommand: bun run dist/server/server.js
     envVars:
       - key: NODE_ENV
         value: production
